@@ -8,9 +8,12 @@ namespace EpamSemanticKernel.WorkshopTasks;
 
 internal class Example1
 {
+    private Example1()
+    {
+    }
+
     public static async Task RunAsync()
     {
-        
         var builder = new KernelBuilder();
 
         // Prompt
