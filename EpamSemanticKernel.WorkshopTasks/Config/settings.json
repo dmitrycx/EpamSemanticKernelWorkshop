@@ -1,0 +1,20 @@
+[
+  {
+    "model": "gpt-35-turbo",
+    "apikey": "",
+    "endpoint": "https://ai-proxy.lab.epam.com",
+    "serviceid": "AzureGtp35TurboService"
+  },
+  {
+    "model": "gpt-4-32k",
+    "apikey": "",
+    "endpoint": "https://ai-proxy.lab.epam.com",
+    "serviceid": "AzureGtp4TurboService"
+  },
+  {
+    "model": "google/flan-t5-xxl",
+    "apikey": "",
+    "endpoint": "none",
+    "serviceid": "HuggingFaceService"
+  }
+]
