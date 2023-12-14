@@ -1,6 +1,8 @@
-﻿using EpamSemanticKernel.WorkshopTasks.Config;
+﻿using System.Runtime.InteropServices.ComTypes;
+using EpamSemanticKernel.WorkshopTasks.Config;
 using Microsoft.SemanticKernel.Connectors.AI.OpenAI;
 using Microsoft.SemanticKernel;
+using Microsoft.SemanticKernel.AI;
 using Microsoft.SemanticKernel.AI.ChatCompletion;
 
 var builder = new KernelBuilder();
@@ -12,12 +14,21 @@ builder.AddAzureOpenAIChatCompletion(model1, model1, azureEndpoint1, apiKey1, se
 var (model2, azureEndpoint2, apiKey2, gpt4ServiceId) = Settings.LoadFromFile(model: "gpt-4-32k");
 builder.AddAzureOpenAIChatCompletion(model2, model2, azureEndpoint2, apiKey2, serviceId: gpt4ServiceId);
 
+var (model3, _, apiKey3, hfServiceId) = Settings.LoadFromFile(model: "google/flan-t5-xxl");
+builder.AddHuggingFaceTextGeneration(model3, apiKey: apiKey3, serviceId:hfServiceId);
+
 var kernel = builder.Build();
 
 var aiRequestSettings = new OpenAIPromptExecutionSettings 
 {
     ExtensionData = new Dictionary<string, object> { { "api-version", "2023-03-15-preview" } },
     ServiceId = gpt4ServiceId
+};
+
+var promptExecutionSettings = new PromptExecutionSettings 
+{
+    ExtensionData = new Dictionary<string, object> { { "api-version", "2023-03-15-preview" } },
+    ServiceId = hfServiceId
 };
 
 var prompt = @"{{$input}}
@@ -32,17 +43,23 @@ var text = @"
 Console.WriteLine(await kernel.InvokeAsync(summarize, new KernelArguments(text)));
 
 
-// Chat
-var input = "I want to find top-10 books about world history";
+var input = "I want to find top-10 comics books";
 string skPrompt = @"ChatBot: How can I help you?
 User: {{$input}}
 
 ---------------------------------------------
 
 Return data requested by user: ";
+var getShortIntentFunction  = kernel.CreateFunctionFromPrompt(skPrompt, promptExecutionSettings);
 
-var getShortIntentFunction  = kernel.CreateFunctionFromPrompt(skPrompt, aiRequestSettings);
 var intentResult = await kernel.InvokeAsync(getShortIntentFunction, new KernelArguments(input));
+
+Console.WriteLine(intentResult);
+
+
+// Chat
+getShortIntentFunction  = kernel.CreateFunctionFromPrompt(skPrompt, aiRequestSettings);
+intentResult = await kernel.InvokeAsync(getShortIntentFunction, new KernelArguments(input));
 Console.WriteLine(intentResult);
 
 // Interactive chat
