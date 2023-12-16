@@ -51,4 +51,20 @@ public class CustomPlugin
 		history += $"\nUser: {arguments["message"]}\nSuggestions: {resultAsString}\n";
 		return history;
 	}
+	
+	[KernelFunction("Translate"), Description("Initiates a translation task with the ChatBot by requesting the translation of a given text to a specified language.")]
+	public async Task<string> TranslateAsync(KernelArguments arguments)
+	{
+		var prompt = @"You are the best linguist. Please translate the given TEXT to {{$lang}}. TEXT: {{$Input}}";
+
+		var renderedPrompt = await _promptTemplateFactory.Create(new PromptTemplateConfig(prompt)).RenderAsync(_kernel, arguments);
+
+		var skFunction = _kernel.CreateFunctionFromPrompt(
+			promptTemplate: renderedPrompt,
+			functionName: nameof(TranslateAsync),
+			description: "Complete the prompt.");
+
+		var result = await skFunction.InvokeAsync(_kernel, arguments);
+		return result?.GetValue<string>() ?? string.Empty;
+	}
 }
