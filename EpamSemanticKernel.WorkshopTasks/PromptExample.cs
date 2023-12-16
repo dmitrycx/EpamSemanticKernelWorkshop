@@ -6,9 +6,9 @@ using Microsoft.SemanticKernel.Connectors.AI.OpenAI;
 
 namespace EpamSemanticKernel.WorkshopTasks;
 
-internal class Example1
+internal class PromptExample
 {
-    private Example1()
+    private PromptExample()
     {
     }
 

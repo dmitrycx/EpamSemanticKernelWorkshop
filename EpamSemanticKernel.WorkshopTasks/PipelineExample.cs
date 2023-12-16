@@ -5,9 +5,9 @@ using Microsoft.SemanticKernel.Events;
 
 namespace EpamSemanticKernel.WorkshopTasks;
 
-internal class Example2
+internal class PipelineExample
 {
-    private Example2()
+    private PipelineExample()
     {
     }
 
