@@ -1,9 +1,11 @@
 using EpamSemanticKernel.WorkshopTasks.Config;
 using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.Connectors.AI.OpenAI;
+using Microsoft.SemanticKernel.Plugins.Web;
+using Microsoft.SemanticKernel.Plugins.Web.Google;
+using Microsoft.SemanticKernel.Plugins.Core;
 
 namespace EpamSemanticKernel.WorkshopTasks;
-using Microsoft.SemanticKernel.Plugins.Core;
 
 public class PluginExample
 {
@@ -83,5 +85,19 @@ public class PluginExample
         await ChatAsync("Describe he main idea of selected facts");
 
         Console.WriteLine($"[Chat History]: {arguments["history"]}");
+        
+        // built-in plugins
+        var (_, googleSearchEngineId, googleApiKey, _) = Settings.LoadFromFile(model: "google-connector");
+        
+        using (var googleConnector = new GoogleConnector(apiKey: googleApiKey,searchEngineId: googleSearchEngineId))
+        {
+            var google = new WebSearchEnginePlugin(googleConnector);
+            kernel.ImportPluginFromObject(new WebSearchEnginePlugin(googleConnector), "google");
+        
+            var question = "What's the largest building in the world?";
+            var function = kernel.Plugins["google"]["search"];
+            result = await kernel.InvokeAsync(function, new(question));
+            Console.WriteLine($"Google search result: {result}");
+        }
     }
 }
